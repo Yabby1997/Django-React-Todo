@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  back:
+    image: todo-back-img
+    container_name: todo-back-con
+    volumes:
+      - ./backend:/home/django/todo
+    command: python3 manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+  front:
+    image : todo-front-img
+    container_name: todo-front-con
+    volumes:
+      - ./frontend:/home/react/todo
+    command: npm run start
+    ports:
+      - "3000:3000"
