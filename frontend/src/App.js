@@ -34,7 +34,7 @@ class App extends Component {
   handleSubmit = item => {
     this.toggle();
     if(item.id){
-      axios.put('http://localhost:8000/api/todos/${item.id}/', item)
+      axios.put('http://localhost:8000/api/todos/' + item.id + '/', item)
       .then(res => this.refreshList());
       alert("Edited!");
       return;
@@ -45,7 +45,7 @@ class App extends Component {
   };
 
   handleDelete = item => {
-    axios.delete('http://localhost:8000/api/todos/${item.id}')
+    axios.delete('http://localhost:8000/api/todos/' + item.id + '/')
     .then(res => this.refreshList());
     alert("Deleted!");
   };
