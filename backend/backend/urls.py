@@ -18,6 +18,7 @@ from django.urls import path, include
 from rest_framework import routers
 from todo import views as todoViews
 from user import views as userViews
+from rest_framework_jwt.views import obtain_jwt_token
 
 router = routers.DefaultRouter()
 router.register(r'todos', todoViews.TodoView, 'todo')   #앞의 r은 오타가아님. rest의 r인듯.
@@ -25,5 +26,5 @@ router.register(r'todos', todoViews.TodoView, 'todo')   #앞의 r은 오타가�
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),  #api/todos 로 todo 정보 가져올 수 있음. 
-    path('api/users/', userViews.UserListCreate.as_view())
+    path('token-auth/', obtain_jwt_token)   #JWT 토큰을 발행해주는 api
 ]
