@@ -26,5 +26,6 @@ router.register(r'todos', todoViews.TodoView, 'todo')   #앞의 r은 오타가�
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),  #api/todos 로 todo 정보 가져올 수 있음. 
-    path('token-auth/', obtain_jwt_token)   #JWT 토큰을 발행해주는 api
+    path('token-auth/', obtain_jwt_token),   #JWT 토큰을 발행해주는 api
+    path('user/', include('user.urls'))
 ]

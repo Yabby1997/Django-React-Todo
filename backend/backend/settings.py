@@ -41,6 +41,12 @@ REST_FRAMEWORK = {
     ),
 }
 
+#JWT 설정
+JWT_AUTH = {
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'backend.utils.my_jwt_response_handler'
+}
+
+
 # Application definition
 
 INSTALLED_APPS = [
