@@ -16,12 +16,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-from todo import views
+from todo import views as todoViews
+from user import views as userViews
 
 router = routers.DefaultRouter()
-router.register(r'todos', views.TodoView, 'todo')   #앞의 r은 오타가아님. rest의 r인듯.
+router.register(r'todos', todoViews.TodoView, 'todo')   #앞의 r은 오타가아님. rest의 r인듯.
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(router.urls))  #api/todos 로 todo 정보 가져올 수 있음. 
+    path('api/', include(router.urls)),  #api/todos 로 todo 정보 가져올 수 있음. 
+    path('api/users/', userViews.UserListCreate.as_view())
 ]

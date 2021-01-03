@@ -27,6 +27,19 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# DRF 설정.
+REST_FRAMEWORK = {
+    # 기본적으로 auth가 되어있어야 하도록 지정함.
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    # request 도착시 시도할 auth method들.
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+}
 
 # Application definition
 
@@ -54,7 +67,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ORIGIN_WHITELIST = [   #Front-end 인 react app이 CORS규칙으로인한 에러를 일으키지 않도록 하기 위함
+CORS_ORIGIN_WHITELIST = [  # Front-end 인 react app이 CORS규칙으로인한 에러를 일으키지 않도록 하기 위함
     'http://localhost:3000'
 ]
 
