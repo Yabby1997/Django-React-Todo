@@ -1,11 +1,18 @@
 import React, { Component } from "react";
 import Modal from "./components/Modal";
 import axios from "axios";
+import Nav from './components/Nav';
+import LoginForm from './components/LoginForm';
+import SignupForm from './components/SignupForm';
+
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      isAuthenticated: localStorage.getItem('token') ? true : false,
+      username: '',
+      displayed_form: 'login',
       modal: false,             //modal 여부
       viewCompleted: false,
       activeItem: {             //선택된 item 정보
@@ -17,15 +24,80 @@ class App extends Component {
     };
   }
 
-  componentDidMount(){
-    this.refreshList();
-  }
+  componentDidMount() {
+    if(this.state.isAuthenticated){
+      fetch('http://localhost:8000/user/current_user/', {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem('token')}`
+        }
+      })
+      .then(res => res.json())
+      .then(json => {
+        this.setState({ username: json.username });
+      })
+      this.refreshList();
+    }
+  };
 
-  refreshList(){
+  handleLogin = (e, data) => {
+    e.preventDefault();
+    fetch('http://localhost:8000/token-auth/', {
+      method: 'POST',
+      headers: {
+        'Content-Type' : 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(json => {
+      localStorage.setItem('token', json.token);
+      this.setState({
+        isAuthenticated: true,
+        displayed_form: '',
+        username: json.user.username
+      })
+    })
+  };
+
+  handleSignup = (e, data) =>{
+    e.preventDefault();
+    fetch('http://localhost:8000/user/users/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(json => {
+      localStorage.setItem('token', json.token);
+      this.setState({
+        isAuthenticated: true,
+        displayed_form: '',
+        username: json.username
+      });
+    });
+  };
+
+  handleLogout = () =>{
+    localStorage.removeItem('token');
+    this.setState({
+      isAuthenticated: false,
+      username: ''
+    })
+  };
+
+  refreshList() {
     axios.get("http://localhost:8000/api/todos/")
-    .then(res => this.setState({ todoList: res.data}))
-    .catch(err => console.log(err));
-  }
+      .then(res => this.setState({ todoList: res.data }))
+      .catch(err => console.log(err));
+  };
+
+  displayForm = form => {
+    this.setState({
+      displayed_form: form
+    });
+  };
 
   toggle = () => {
     this.setState({ modal: !this.state.modal });
@@ -33,20 +105,20 @@ class App extends Component {
 
   handleSubmit = item => {
     this.toggle();
-    if(item.id){
+    if (item.id) {
       axios.put('http://localhost:8000/api/todos/' + item.id + '/', item)
-      .then(res => this.refreshList());
+        .then(res => this.refreshList());
       alert("Edited!");
       return;
     }
     axios.post('http://localhost:8000/api/todos/', item)
-    .then(res => this.refreshList());
+      .then(res => this.refreshList());
     alert("Created!");
   };
 
   handleDelete = item => {
     axios.delete('http://localhost:8000/api/todos/' + item.id + '/')
-    .then(res => this.refreshList());
+      .then(res => this.refreshList());
     alert("Deleted!");
   };
 
@@ -124,24 +196,55 @@ class App extends Component {
     ));
   };
 
+  renderTodo = () => {
+    return (
+      <div className="card p-3">
+        <div className="">
+          <button
+            onClick={this.createItem}
+            className="btn btn-primary"
+          >Add task</button>
+        </div>
+        {this.renderTabList()}
+        <ul className="list-group list-group-flush">
+          {this.renderItems()}
+        </ul>
+      </div>
+    );
+  };
+
+  renderLogin = form => {
+    return (
+      <div className="card p-3">
+        {form}
+      </div>
+    );
+  }
+
   render() {
+    let form;
+    switch (this.state.displayed_form){
+      case 'login':
+        form = <LoginForm handle_login={this.handleLogin}></LoginForm>;
+        break;
+      case 'signup':
+        form = <SignupForm handle_signup={this.handleSignup}></SignupForm>;
+        break;
+      default:
+        form = null;
+    }
+
     return (
       <main className="content">
-        <h1 className="text-white text-uppercase text-center my-4">Todo app</h1>
+        <h1 className="text-white text-uppercase text-center my-4">Todo</h1>
         <div className="row ">
           <div className="col-md-6 col-sm-10 mx-auto p-0">
-            <div className="card p-3">
-              <div className="">
-                <button
-                  onClick={this.createItem}
-                  className="btn btn-primary"
-                >Add task</button>
-              </div>
-              {this.renderTabList()}
-              <ul className="list-group list-group-flush">
-                {this.renderItems()}
-              </ul>
-            </div>
+            <Nav
+              logged_in={this.state.isAuthenticated}
+              display_form={this.displayForm}
+              handle_logout={this.handleLogout}
+            ></Nav>
+            {this.state.isAuthenticated ? this.renderTodo() : this.renderLogin(form)}
           </div>
         </div>
         {this.state.modal ? (

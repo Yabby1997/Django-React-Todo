@@ -7,8 +7,8 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         # 해당 Serializer가 다루게 될 model을 명시
         model = User   
-        # 반환하게될 값을 명시                     
-        fields = ('username')
+        # 반환하게될 값을 명시        
+        fields = ('username', 'password')
 
 
 # 가입을 위한 serializer
@@ -33,7 +33,7 @@ class UserSerializerWithToken(serializers.ModelSerializer):
         password = validated_data.pop('password', None)
         instance = self.Meta.model(**validated_data)
         if password is not None:
-            instance.self_password(password)
+            instance.set_password(password)
         instance.save()
         return instance
 

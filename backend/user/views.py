@@ -12,6 +12,7 @@ from .serializers import UserSerializer, UserSerializerWithToken
 def current_user(request):
     # request.user를 인자로 UserSerializer로 보낸다.
     serializer = UserSerializer(request.user)
+    print('current_user called!!!')
     return Response(serializer.data)
 
 
